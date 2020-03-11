@@ -1,0 +1,9 @@
+{
+  "name": "Carbon Intensity",
+  "description": "UK CO2 intensity",
+  "uuid": "uk-grid-carbon-intensity-extension@markac.github.com",
+  "shell-version": [
+    "3.34"
+  ],
+  "version": "0.1.0"
+}
