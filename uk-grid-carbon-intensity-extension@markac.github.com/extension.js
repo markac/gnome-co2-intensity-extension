@@ -23,28 +23,26 @@ const _httpSession = new Soup.SessionAsync();
 const url = 'https://api.carbonintensity.org.uk/intensity'
 
 
-var 	label = null
+var label = null
 
 // We'll extend the Button class from Panel Menu so we can do some setup in
 // the init() function.
-var ExampleIndicator = class ExampleIndicator extends PanelMenu.Button {
+var ExampleIndicator = GObject.registerClass(
+	{
+		GType: 'ExampleIndicator'
+	},
+	class ExampleIndicator extends PanelMenu.Button {
+         _init() {
+           super._init(0.0, `${Me.metadata.name} Indicator`, false);
 
-    _init() {
-        super._init(0.0, `${Me.metadata.name} Indicator`, false);
+           this.text = new St.Label({ style_class: 'carbon-intensity-label', text: "124" });
+	       label = this.text
+           this.actor.add_child(this.text);
 
-        this.text = new St.Label({ style_class: 'carbon-intensity-label', text: "124" });
-	label = this.text
-        this.actor.add_child(this.text);
-
-	updateUI();
-
+	       updateUI();
+        }
     }
-}
-
-
-
-
-
+)
 
 function updateUI() {
 	let request = Soup.Message.new('GET',url);
@@ -55,7 +53,7 @@ function updateUI() {
                 }
                 let res = request.response_body.data;
                 let resjsn = JSON.parse(res);
-		let currentIntensity = resjsn.data[0].intensity.actual; 
+		let currentIntensity = resjsn.data[0].intensity.actual;
 		log("Response: " + currentIntensity);
 		label.set_text("CO₂: " + currentIntensity);
 		let colour = getColor(scaleIntensity(currentIntensity, 100, 300));
@@ -70,8 +68,6 @@ function updateUI() {
 
 }
 
-
-
 function scaleIntensity(intensity, minIntensity, maxIntensity) {
     let boundedIntensity = Math.max(Math.min(maxIntensity, intensity), minIntensity);
     log("BoundedIntensity: " + boundedIntensity);
@@ -83,10 +79,9 @@ function scaleIntensity(intensity, minIntensity, maxIntensity) {
 function getColor(value) {
     let r = value > 0.5 ? 255 : Math.floor(2 * value * 255);
     let g = value < 0.5 ? 255 : Math.floor(255-(2 * (value - 0.5) * 255));
-   
+
     return 'rgb('+r+','+g+',0)';
 }
-
 
 // Compatibility with gnome-shell >= 3.32
 if (SHELL_MINOR > 30) {
@@ -105,7 +100,6 @@ function init() {
     log(`initializing ${Me.metadata.name} version ${Me.metadata.version}`);
 
 }
-
 
 function enable() {
     log(`enabling ${Me.metadata.name} version ${Me.metadata.version}`);
